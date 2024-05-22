@@ -9,6 +9,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
@@ -51,6 +52,32 @@ public class RedisService {
             log("Error obtaining values", ex);
             throw new RedisException(ex);
         }
+    }
+
+    public void setData(DataRecord data) throws RedisException {
+
+        try {
+            this.valueCommands.set(data.getObjectKey(), data);
+        } catch (Exception ex) {
+            log("Error setting data ".concat(data.getObjectKey()), ex);
+            throw new RedisException(ex);
+        }
+
+    }
+
+    public Optional<DataRecord> getData(String key) throws RedisException {
+
+        DataRecord o = null;
+
+        try {
+            o = this.valueCommands.get(DataRecord.buildKey(key));
+        } catch (Exception ex) {
+            log("Error obtaining data for key ".concat(key), ex);
+            throw new RedisException(ex);
+        }
+
+        return Optional.ofNullable(o);
+
     }
 
     private void log(String message, Exception ex) {
